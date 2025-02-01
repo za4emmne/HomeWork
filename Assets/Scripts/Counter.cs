@@ -1,27 +1,52 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Button))]
+
 public class Counter : MonoBehaviour
 {
-    [SerializeField] private Text _countText;
-    private float _count;
+    [SerializeField] private CountShower _shower;
+
+    private Button _button;
+    private int _count = 0;
     private float _delay = 0.5f;
     private Coroutine _coroutine;
 
-    public void StartCoroutine()
+    private void Awake()
     {
-        if (_coroutine == null)
-            _coroutine = StartCoroutine(CountWork());
-        else
-            StopCoroutine();
+        _button = GetComponent<Button>();
+    }
+
+    private void OnEnable()
+    {
+        _button.onClick.AddListener(HandlerButtonClick);
+    }
+
+    private void OnDisable()
+    {
+        _button.onClick.RemoveListener(HandlerButtonClick);
     }
 
     public void StopCoroutine()
     {
         StopCoroutine(_coroutine);
         _coroutine = null;
+    }
+
+    private void HandlerButtonClick()
+    {
+        if (_coroutine == null)
+        {
+            _coroutine = StartCoroutine(CountWork());
+        }
+        else
+        {
+            if (_coroutine != null)
+            {
+                StopCoroutine();
+            }
+        }
     }
 
     private IEnumerator CountWork()
@@ -31,7 +56,7 @@ public class Counter : MonoBehaviour
         while (enabled)
         {
             _count++;
-            _countText.text = _count.ToString();
+            _shower.ChangeCount(_count);
             yield return wait;
         }
     }
